@@ -1,11 +1,11 @@
-package simbir.store.service.vendor;
+package simbir.store.service.task.manager;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class VendorApplication {
+public class TaskManagerApplication {
     public static void main(String[] args) {
-        SpringApplication.run(VendorApplication.class, args);
+        SpringApplication.run(TaskManagerApplication.class, args);
     }
 }
