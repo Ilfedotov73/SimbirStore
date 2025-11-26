@@ -8,10 +8,10 @@
 		<version>3.5.6</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>simbir.apex.service</groupId>
-	<artifactId>collector</artifactId>
+	<groupId>simbir.store.service.vendor</groupId>
+	<artifactId>vendor</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>collector</name>
+	<name>vendor</name>
 	<description>Vendor service for Simbir.store app</description>
 	<url/>
 	<licenses>
