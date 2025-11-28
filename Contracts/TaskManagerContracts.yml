@@ -1,0 +1,311 @@
+openapi: 3.0.0
+info:
+  title: API SimbirStore.ServiceTaskManager
+  version: '1.0'
+servers:
+  - url: http://localhost:8080/api/v1
+    description: Dev server 
+paths:
+
+# GET methods
+  /GetVenndorRegTasks:
+    get:
+      summary: Метод получения списка отложенных задач - заявок регистрацию продавца.
+      tags:
+        - Vendor
+      responses:
+        '200':
+          description: OK
+          content:
+            applictation/json:
+              schema:
+                $ref: "#/components/schemas/TasksListVendorRegistration"
+        'default':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /GetProductsRegTasks:
+    get:
+      tags:
+        - Product
+      summary: Метод получения списка отложенных задач - заявок на регистрацию контейнера товаров.
+      responses:
+        '200':
+          description: OK
+          content:
+            applictation/json:
+              schema:
+                $ref: "#/components/schemas/TasksListProductsRegistration"
+        'default':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        
+  /GetVendorRegTaskById/{id}:
+    get:
+      summary: Получение записи на регистрацию продавца по Id из TasksQueueVendorRegistration.
+      tags: 
+        - Vendor
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Идентификатор записи в TasksQueueVendorRegistration.
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            applictation/json:
+              schema:
+                $ref: "#/components/schemas/TaskVendorRegistration"
+        'default':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /GetProductRegTaskById/{id}:
+    get:
+      summary: Получение записи на регистрацию контейнера товаров по Id из TasksQueueProductsRegistration.
+      tags:
+        - Product
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Идентификатор записи в TasksQueueProductsRegistration.
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            applictation/json:
+              schema:
+                $ref: "#/components/schemas/TaskProductsRegistration"
+        'default':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+# POST methods
+
+  /InsertVendorRegTask:
+    post:
+      summary: Метод добавления данных записи на регистрацйю продавца.
+      tags:
+        - Vendor
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TaskVendorRegistration"
+      responses:
+        '200':
+          description: OK
+          content:
+            applictation/json:
+              schema:
+                $ref: "#/components/schemas/TaskVendorRegistration"
+        'default':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /InsertProductsRegTask:
+    post:
+      summary: Метод добавления данных записи на регистрацию контейнера товаров.
+      tags:
+        - Product
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TaskProductsRegistration"
+      responses:
+        '200':
+          description: OK
+          content:
+            applictation/json:
+              schema:
+                $ref: "#/components/schemas/TaskProductsRegistration"
+        'default':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+# PATCH methods
+  /PatchVendorRegTask/{status}/{adminId}/{taskId}:
+    patch:
+      summary: Метод обновления данных записи на регистрацйю продавца.
+      tags:
+        - Vendor
+      parameters:
+        - name: status
+          in: path
+          required: true
+          description: Текущий статус работы.
+          schema:
+            type: string
+            enum:
+              - Ожидает обработки
+              - Обрабатывается администратором
+              - Регистрация выполнена
+              - Отклонено
+        - name: adminId
+          in: path
+          required: true
+          description: Идентификатор назначенного администратора.
+          schema:
+            type: integer
+        - name: taskId
+          in: path
+          required: true
+          description: Идентификатор записи в TasksQueueVendorRegistration.
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+        'default':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /PatchProductsRegTask/{status}/{adminId}/{taskId}:
+    patch:
+      summary: Метод обновления данных записи на регистрацию контейнера товаров.
+      tags:
+        - Product
+      parameters:
+        - name: status
+          in: path
+          required: true
+          description: Текущий статус работы.
+          schema:
+            type: string
+            enum:
+              - Ожидает обработки
+              - Обрабатывается администратором
+              - Регистрация выполнена
+              - Отклонено
+        - name: adminId
+          in: path
+          required: true
+          description: Идентификатор назначенного администратора.
+          schema:
+            type: integer
+        - name: taskId
+          in: path
+          required: true
+          description: Идентификатор записи в TasksQueueVendorRegistration.
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+        'default':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+components:
+  schemas:
+    TaskVendorRegistration:
+      type: object
+      properties:
+        Id:
+          type: integer
+          example: 0
+        TaskName:
+          type: string
+          example: РегистрацияТовара
+        UserId:
+          type: integer
+          example: 0
+        Deadline:
+          type:  string
+          format: YYYY-MM-DDTHH:mm:ss
+          example: 2025-07-01:00:00
+        Status:
+          type: string
+          enum:
+            - Ожидает обработки
+            - Обрабатывается администратором
+            - Регистрация выполнена
+            - Отклонено 
+          example: Выполняется
+        CreatAt:
+          type: string
+          format: YYYY-MM-DDTHH:mm:ss
+          example: 2025-01-01:00:00
+
+    TasksListVendorRegistration:
+      type: array
+      items: 
+        $ref: "#/components/schemas/TaskVendorRegistration"
+
+    TaskProductsRegistration:
+      type: object
+      properties:
+        Id:
+          type: integer
+          example: 0
+        TaskName:
+          type: string
+          example: РегистрацияТовара
+        UserId:
+          type: integer
+          example: 0
+        Deadline:
+          type:  string
+          format: YYYY-MM-DDTHH:mm:ss
+          example: 2025-07-01:00:00
+        Status:
+          type: string
+          enum:
+            - Ожидает обработки
+            - Обрабатывается администратором
+            - Регистрация выполнена
+            - Отклонено 
+          example: Выполняется
+        CreatAt:
+          type: string
+          format: YYYY-MM-DDTHH:mm:ss
+          example: 2025-01-01:00:00
+        Container:
+          type: string
+          description: Контейнер в формате .XML
+
+    TasksListProductsRegistration:
+      type: array
+      items: 
+        $ref: "#/components/schemas/TaskProductsRegistration"
+
+    Error:
+      type: object
+      properties:
+        code:
+          type: integer
+        message:
+          type: string
