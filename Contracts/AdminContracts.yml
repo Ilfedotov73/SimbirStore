@@ -1,0 +1,515 @@
+openapi: 3.0.0
+info:
+  title: Service Admin API
+  version: '1.0.0'
+servers:
+  - url: http://{serviceHost}:{servicePort}/api/v1
+    variables:
+      serviceHost:
+        default: 'localhost'
+      servicePort:
+        default: '8090'
+
+components:
+  parameters:
+    TaskIdPath:
+      name: taskId
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+      description: Идентификатор задачи
+    UnprocessedQuery:
+      name: unprocessed
+      in: query
+      required: true
+      schema:
+        type: integer
+        format: int32
+      description: 1 - запросить только необработанные задачи, 0 - только обрабатываемые задачи
+    
+  schemas:
+    ErrorResponse:
+      type: object
+      required: [ error ]
+      properties:
+        code:
+          type: string
+          enum:
+            - SERVER_ERROR
+            - ALREADY_ASSIGNED
+            - TASK_NOT_FOUND
+            - FAILED_START_PROCESSING
+            - FAILED_ACCEPT_PRODUCT
+            - FAILED_DENY_PRODUCT
+            - FAILED_ACCEPT_VENDOR
+            - FAILED_DENY_VENDOR
+        message:
+          type: string
+    Product:
+      type: object
+      required: [ id, name, price, characteristics, productRating ]
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        price:
+          type: number
+          format: float
+        photoUrl:
+          type: string
+          format: uri
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+          nullable: true
+        characteristics:
+          type: string
+        productRating:
+          type: number
+          format: float
+    Vendor:
+      type: object
+      required: [ firstName, lastName, phoneNumber, login, email, password ]
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        phoneNumber:
+          type: string
+        photoUrl:
+          type: string
+          nullable: true
+        vendorTelegramId:
+          type: string
+          nullable: true
+        login:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+    ProductRegistration:
+      type: object
+      required: [ id, task, vendorId, product, deadline, status ]
+      properties:
+        id:
+          type: integer
+          format: int64
+        task:
+          type: string
+        vendorId:
+          type: integer
+          format: int64
+        product:
+          $ref: '#/components/schemas/Product'
+        deadline:
+          type: string
+          format: date-time
+        status:
+          type: string
+          enum:
+            - NOT_ASSIGNED
+            - BEING_PROCESSED
+            - REGISTRATION_COMPLETED
+            - DENIED
+        createdAt:
+          type: string
+          format: date-time
+          nullable: true
+    VendorRegistration:
+      type: object
+      required: [ id, task, userId, product, deadline, status ]
+      properties:
+        id:
+          type: integer
+          format: int64
+        task:
+          type: string
+        userId:
+          type: integer
+          format: int64
+        vendor:
+          $ref: '#/components/schemas/Vendor'
+        deadline:
+          type: string
+          format: date-time
+        status:
+          type: string
+          enum:
+            - NOT_ASSIGNED
+            - BEING_PROCESSED
+            - REGISTRATION_COMPLETED
+            - DENIED
+        createdAt:
+          type: string
+          format: date-time
+          nullable: true
+
+paths:
+  /product:
+    get:
+      summary: Получить список свободных или обрабатываемых задач по регистрации товара
+      description: Возвращает список задач
+      parameters:
+        - $ref: '#/components/parameters/UnprocessedQuery'
+      responses:
+        '200':
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProductRegistration'
+              example:
+                - id: 1
+                  task: 'РегистрацияТовара'
+                  vendorId: 95
+                  product:
+                    id: 10
+                    name: 'SomeТовар'
+                    price: 49.99
+                    photoUrl: 'https://example.com/product1.jpg'
+                    createdAt: '2025-11-20T00:00:00Z'
+                    characteristics: 'Не очень дорогой'
+                    productRating: 4.8
+                  deadline: '2025-12-01T00:00:00Z'
+                  status: 'NOT_ASSIGNED'
+                  createAt: '2025-11-20T12:00:00Z'
+                - id: 2
+                  task: 'РегистрацияТовара'
+                  vendorId: 99
+                  product:
+                    id: 24
+                    name: 'AnotherТовар'
+                    price: 249.99
+                    photoUrl: 'https://example.com/product2.jpg'
+                    createdAt: '2025-11-20T00:00:00Z'
+                    characteristics: 'Уже дороже'
+                    productRating: 4.0
+                  deadline: '2025-12-01T00:00:00Z'
+                  status: 'NOT_ASSIGNED'
+                  createAt: '2025-11-20T12:00:00Z'
+        '500':
+          description: Невозможно получить список задач
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+              example:
+                code: SERVER_ERROR
+                message: Unable to connect to Task Manager Service
+
+  /product/process/{taskId}:
+    post:
+      summary: Взять задачу по регистрации товара на выполнение
+      description: Назначает задачу на текущего администратора и возвращает объект этой задачи
+      parameters:
+        - $ref: '#/components/parameters/TaskIdPath'
+      responses:
+        '200':
+          description: Задача успешно принята в обработку
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductRegistration'
+              example:
+                id: 1
+                task: 'РегистрацияТовара'
+                vendorId: 95
+                product:
+                  id: 10
+                  name: 'SomeТовар'
+                  price: 49.99
+                  photoUrl: 'https://example.com/product1.jpg'
+                  createdAt: '2025-11-20T00:00:00Z'
+                  characteristics: 'Не очень дорогой'
+                  productRating: 4.8
+                deadline: '2025-12-01T00:00:00Z'
+                status: 'BEING_PROCESSED'
+                createAt: '2025-11-20T12:00:00Z'
+        '404':
+          description: Задача не найдена
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+              example:
+                code: TASK_NOT_FOUND
+                message: Task with provided ID was not found
+        '500':
+          description: Невозможно назначить задачу на администратора
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+              example:
+                code: ALREADY_ASSIGNED
+                message: This task was already assigned to administrator
+
+  /product/accept/{taskId}:
+    post:
+      summary: Зарегистрировать товар
+      description: Подтверждает регистрацию товара
+      parameters:
+        - $ref: '#/components/parameters/TaskIdPath'
+      responses:
+        '200':
+          description: Товар зарегистрирован
+          content:
+            application/json:
+              schema:
+                type: string
+              example:
+                id: 1
+                task: 'РегистрацияТовара'
+                vendorId: 95
+                product:
+                  id: 10
+                  name: 'SomeТовар'
+                  price: 49.99
+                  photoUrl: 'https://example.com/product1.jpg'
+                  createdAt: '2025-11-20T00:00:00Z'
+                  characteristics: 'Не очень дорогой'
+                  productRating: 4.8
+                deadline: '2025-12-01T00:00:00Z'
+                status: 'REGISTRATION_COMPLETED'
+                createAt: '2025-11-20T12:00:00Z'
+        '404':
+          description: Задача не найдена
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '500':
+          description: Невозможно зарегистрировать товар
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /product/deny/{taskId}:
+    post:
+      summary: Отказать в регистрации товара
+      description: Отменяет регистрацию товара, обновляя соответствующую задачу
+      parameters:
+        - $ref: '#/components/parameters/TaskIdPath'
+      responses:
+        '200':
+          description: Отказ регистрации товара
+          content:
+            application/json:
+              schema:
+                type: string
+              example:
+                id: 1
+                task: 'РегистрацияТовара'
+                vendorId: 95
+                product:
+                  id: 10
+                  name: 'SomeТовар'
+                  price: 49.99
+                  photoUrl: 'https://example.com/product1.jpg'
+                  createdAt: '2025-11-20T00:00:00Z'
+                  characteristics: 'Не очень дорогой'
+                  productRating: 4.8
+                deadline: '2025-12-01T00:00:00Z'
+                status: 'DENIED'
+                createAt: '2025-11-20T12:00:00Z'
+        '404':
+          description: Задача не найдена
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '500':
+          description: Невозможно отменить регистрацию товара
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /vendor:
+    get:
+      summary: Получить список свободных или обрабатываемых задач по регистрации продавца
+      description: Возвращает список задач
+      parameters:
+        - $ref: '#/components/parameters/UnprocessedQuery'
+      responses:
+        '200':
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/VendorRegistration'
+              example:
+                - id: 1
+                  task: 'РегистрацияПродавца'
+                  userId: 95
+                  vendor:
+                    id: 10
+                    firstName: 'Имя'
+                    lastName: 'Фамилия'
+                    phoneNumber: +79998887766
+                    photoUrl: 'https://example.com/vendor1.jpg'
+                    vendorTelegramId: '@someuser'
+                    login: 'somelogin'
+                    email: 'sudo@example.com'
+                    password: 'somepassword'
+                  deadline: '2025-12-01T00:00:00Z'
+                  status: 'NOT_ASSIGNED'
+                  createAt: '2025-11-20T12:00:00Z'
+                - id: 2
+                  task: 'РегистрацияПродавца'
+                  vendorId: 99
+                  vendor:
+                    id: 11
+                    firstName: 'Имя2'
+                    lastName: 'Фамилия2'
+                    phoneNumber: +79998887766
+                    photoUrl: 'https://example.com/vendor2.jpg'
+                    vendorTelegramId: '@anotheruser'
+                    login: 'anotherlogin'
+                    email: 'sudo@example.com'
+                    password: 'somepassword'
+                  deadline: '2025-12-01T00:00:00Z'
+                  status: 'NOT_ASSIGNED'
+                  createAt: '2025-11-20T12:00:00Z'
+        '500':
+          description: Невозможно получить список задач
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+              example:
+                code: SERVER_ERROR
+                message: Unable to connect to Task Manager Service
+
+  /vendor/process/{taskId}:
+    post:
+      summary: Взять задачу по регистрации продавца на выполнение
+      description: Назначает задачу на текущего администратора и возвращает объект этой задачи
+      parameters:
+        - $ref: '#/components/parameters/TaskIdPath'
+      responses:
+        '200':
+          description: Задача успешно принята в обработку
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VendorRegistration'
+              example:
+                id: 1
+                task: 'РегистрацияПродавца'
+                vendorId: 95
+                vendor:
+                  id: 10
+                  firstName: 'Имя'
+                  lastName: 'Фамилия'
+                  phoneNumber: +79998887766
+                  photoUrl: 'https://example.com/vendor1.jpg'
+                  vendorTelegramId: '@someuser'
+                  login: 'somelogin'
+                  email: 'sudo@example.com'
+                  password: 'somepassword'
+                deadline: '2025-12-01T00:00:00Z'
+                status: 'BEING_PROCESSED'
+                createAt: '2025-11-20T12:00:00Z'
+        '404':
+          description: Задача не найдена
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+              example:
+                code: TASK_NOT_FOUND
+                message: Task with provided ID was not found
+        '500':
+          description: Невозможно назначить задачу на администратора
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+              example:
+                code: ALREADY_ASSIGNED
+                message: This task was already assigned to administrator
+
+  /vendor/accept/{taskId}:
+    post:
+      summary: Зарегистрировать продавца
+      description: Подтверждает регистрацию продавца
+      parameters:
+        - $ref: '#/components/parameters/TaskIdPath'
+      responses:
+        '200':
+          description: Продавец зарегистрирован
+          content:
+            application/json:
+              schema:
+                type: string
+              example:
+                id: 1
+                task: 'РегистрацияПродавца'
+                vendorId: 95
+                vendor:
+                  id: 10
+                  firstName: 'Имя'
+                  lastName: 'Фамилия'
+                  phoneNumber: +79998887766
+                  photoUrl: 'https://example.com/vendor1.jpg'
+                  vendorTelegramId: '@someuser'
+                  login: 'somelogin'
+                  email: 'sudo@example.com'
+                  password: 'somepassword'
+                deadline: '2025-12-01T00:00:00Z'
+                status: 'BEING_PROCESSED'
+                createAt: '2025-11-20T12:00:00Z'
+        '404':
+          description: Задача не найдена
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '500':
+          description: Невозможно зарегистрировать продавца
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /vendor/deny/{taskId}:
+    post:
+      summary: Отказать в регистрации продавца
+      description: Отменяет регистрацию продавца, обновляя соответствующую задачу
+      parameters:
+        - $ref: '#/components/parameters/TaskIdPath'
+      responses:
+        '200':
+          description: Отказ регистрации продавца
+          content:
+            application/json:
+              schema:
+                type: string
+              example:
+                id: 1
+                task: 'РегистрацияПродавца'
+                vendorId: 95
+                vendor:
+                  id: 10
+                  firstName: 'Имя'
+                  lastName: 'Фамилия'
+                  phoneNumber: +79998887766
+                  photoUrl: 'https://example.com/vendor1.jpg'
+                  vendorTelegramId: '@someuser'
+                  login: 'somelogin'
+                  email: 'sudo@example.com'
+                  password: 'somepassword'
+                deadline: '2025-12-01T00:00:00Z'
+                status: 'BEING_PROCESSED'
+                createAt: '2025-11-20T12:00:00Z'
+        '404':
+          description: Задача не найдена
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '500':
+          description: Невозможно отменить регистрацию продавца
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
