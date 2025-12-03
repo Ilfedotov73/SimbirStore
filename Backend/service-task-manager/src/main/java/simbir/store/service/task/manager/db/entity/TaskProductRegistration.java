@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.sql.Date;
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "tasks_queue_product_registration")
@@ -18,6 +17,8 @@ public class TaskProductRegistration {
     private Long id;
 
     private Long userId;
+
+    private String taskName;
 
     private String productContainer;
 

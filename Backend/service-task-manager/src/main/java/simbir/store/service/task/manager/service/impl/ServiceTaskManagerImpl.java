@@ -10,8 +10,12 @@ import simbir.store.service.task.manager.db.jpaRepository.AdminsTasksQueueProduc
 import simbir.store.service.task.manager.db.jpaRepository.AdminsTasksQueueVendorRegistrationRepository;
 import simbir.store.service.task.manager.db.jpaRepository.TasksQueueProductsRegistrationRepository;
 import simbir.store.service.task.manager.db.jpaRepository.TasksQueueVendorRegistrationRepository;
+import simbir.store.service.task.manager.dto.TaskProductsRegistrationDto;
+import simbir.store.service.task.manager.dto.TaskVendorRegistrationDto;
 import simbir.store.service.task.manager.service.ServiceTaskManager;
 
+import java.sql.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -29,22 +33,28 @@ public class ServiceTaskManagerImpl implements ServiceTaskManager {
     // -----------------------------
 
     @Override
-    public Long createVendorRegistrationTask(Long userId) {
+    public TaskVendorRegistrationDto createVendorRegistrationTask(TaskVendorRegistrationDto dto) {
         TaskVendorRegistration task = new TaskVendorRegistration();
-        task.setUserId(userId);
-        task.setStatus("не обработано");
+        task.setTaskName(dto.getTaskName());
+        task.setUserId(dto.getUserId());
+        task.setDeadline(LocalDateTime.parse(dto.getDeadline()));
+        task.setStatus(dto.getStatus());
+        task.setCreatedAt(Date.valueOf(dto.getCreatAt()));
         vendorRegRepo.save(task);
-        return task.getId();
+        return dto;
     }
 
     @Override
-    public Long createProductsRegistrationTask(Long userId, String xmlData) {
+    public TaskProductsRegistrationDto createProductsRegistrationTask(TaskProductsRegistrationDto dto) {
         TaskProductRegistration task = new TaskProductRegistration();
-        task.setUserId(userId);
-        task.setProductContainer(xmlData);
-        task.setStatus("не обработано");
+        task.setTaskName(dto.getTaskName());
+        task.setUserId(dto.getUserId());
+        task.setProductContainer(dto.getContainer());
+        task.setStatus(dto.getStatus());
+        task.setDeadline(Date.valueOf(dto.getDeadline()));
+        task.setCreatedAt(Date.valueOf(dto.getCreatAt()));
         productsRegRepo.save(task);
-        return task.getId();
+        return dto;
     }
 
     // -----------------------------
@@ -59,6 +69,18 @@ public class ServiceTaskManagerImpl implements ServiceTaskManager {
     @Override
     public List<TaskProductRegistration> getProductsRegistrationTasks() {
         return productsRegRepo.findAllByOrderByCreatedAtAsc();
+    }
+
+    @Override
+    public TaskVendorRegistration getVendorRegistrationTaskById(Long taskId) {
+        return vendorRegRepo.findById(taskId)
+                .orElseThrow(() -> new RuntimeException("Vendor registration task not found"));
+    }
+
+    @Override
+    public TaskProductRegistration getProductsRegistrationTaskById(Long taskId) {
+        return productsRegRepo.findById(taskId)
+                .orElseThrow(() -> new RuntimeException("Product registration task not found"));
     }
 
     // -----------------------------
@@ -87,7 +109,7 @@ public class ServiceTaskManagerImpl implements ServiceTaskManager {
     // -----------------------------
 
     @Override
-    public void updateVendorRegistrationTaskStatus(Long taskId, String status) {
+    public void updateVendorRegistrationTaskStatus(Long taskId, Long adminId, String status) {
         TaskVendorRegistration task = vendorRegRepo.findById(taskId)
                 .orElseThrow(() -> new RuntimeException("Task not found"));
         task.setStatus(status);
@@ -95,7 +117,7 @@ public class ServiceTaskManagerImpl implements ServiceTaskManager {
     }
 
     @Override
-    public void updateProductsRegistrationTaskStatus(Long taskId, String status) {
+    public void updateProductsRegistrationTaskStatus(Long taskId, Long adminId, String status) {
         TaskProductRegistration task = productsRegRepo.findById(taskId)
                 .orElseThrow(() -> new RuntimeException("Task not found"));
         task.setStatus(status);

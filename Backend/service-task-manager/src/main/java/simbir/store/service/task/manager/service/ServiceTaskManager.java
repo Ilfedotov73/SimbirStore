@@ -2,24 +2,29 @@ package simbir.store.service.task.manager.service;
 
 import simbir.store.service.task.manager.db.entity.TaskProductRegistration;
 import simbir.store.service.task.manager.db.entity.TaskVendorRegistration;
+import simbir.store.service.task.manager.dto.TaskProductsRegistrationDto;
+import simbir.store.service.task.manager.dto.TaskVendorRegistrationDto;
 
 import java.util.List;
 
 public interface ServiceTaskManager {
 
-    Long createVendorRegistrationTask(Long vendorId);
+    TaskVendorRegistrationDto createVendorRegistrationTask(TaskVendorRegistrationDto dto);
 
-    Long createProductsRegistrationTask(Long vendorId, String xmlPath);
+    TaskProductsRegistrationDto createProductsRegistrationTask(TaskProductsRegistrationDto dto);
 
     List<TaskVendorRegistration> getVendorRegistrationTasks();
 
     List<TaskProductRegistration> getProductsRegistrationTasks();
 
+    TaskVendorRegistration getVendorRegistrationTaskById(Long taskId);
+    TaskProductRegistration getProductsRegistrationTaskById(Long taskId);
+
     void assignVendorRegistrationTask(Long adminId, Long taskId);
 
     void assignProductsRegistrationTask(Long adminId, Long taskId);
 
-    void updateVendorRegistrationTaskStatus(Long taskId, String status);
+    void updateVendorRegistrationTaskStatus(Long taskId, Long adminId, String status);
 
-    void updateProductsRegistrationTaskStatus(Long taskId, String status);
+    void updateProductsRegistrationTaskStatus(Long taskId, Long adminId, String status);
 }

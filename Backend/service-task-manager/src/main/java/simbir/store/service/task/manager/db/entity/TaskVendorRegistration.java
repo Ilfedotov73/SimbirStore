@@ -17,6 +17,8 @@ public class TaskVendorRegistration {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String taskName;
+
     private Long userId;
 
     @Enumerated(EnumType.STRING)
