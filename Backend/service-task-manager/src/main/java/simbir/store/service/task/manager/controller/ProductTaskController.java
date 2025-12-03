@@ -14,7 +14,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ProductTaskController {
 
-    private final ServiceTaskManager taskManager;
+
+    private  ServiceTaskManager taskManager;
 
     // ---------------------------------------------------------
     // GET /GetProductsRegTasks
@@ -59,7 +60,7 @@ public class ProductTaskController {
             @PathVariable Long adminId,
             @PathVariable Long taskId
     ) {
-        taskManager.updateProductsRegistrationTaskStatus(taskId, adminId , status);
+        taskManager.updateProductsRegistrationTaskStatus(taskId, adminId, status);
         return ResponseEntity.ok().build();
     }
 }

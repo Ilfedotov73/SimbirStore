@@ -14,7 +14,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class VendorTaskController {
 
-    private final ServiceTaskManager taskManager;
+    private  ServiceTaskManager taskManager;
 
     // ---------------------------------------------------------
     // GET /GetVenndorRegTasks

@@ -16,7 +16,40 @@ public class AdminTaskVendorRegistration {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    public void setAdminId(Long adminId) {
+        this.adminId = adminId;
+    }
+
+    public void setAssignedAt(Date assignedAt) {
+        this.assignedAt = assignedAt;
+    }
+
+    public void setTaskId(Long taskId) {
+        this.taskId = taskId;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     private Long adminId;
+
+    public Long getId() {
+        return id;
+    }
+
+    public Date getAssignedAt() {
+        return assignedAt;
+    }
+
+    public Long getTaskId() {
+        return taskId;
+    }
+
+    public Long getAdminId() {
+        return adminId;
+    }
+
     private Long taskId;
 
     private Date assignedAt;

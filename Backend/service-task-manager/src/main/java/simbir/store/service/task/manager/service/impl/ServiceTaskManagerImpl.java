@@ -22,11 +22,11 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ServiceTaskManagerImpl implements ServiceTaskManager {
 
-    private final TasksQueueVendorRegistrationRepository vendorRegRepo;
-    private final TasksQueueProductsRegistrationRepository productsRegRepo;
+    private  TasksQueueVendorRegistrationRepository vendorRegRepo;
+    private  TasksQueueProductsRegistrationRepository productsRegRepo;
 
-    private final AdminsTasksQueueVendorRegistrationRepository adminsVendorRepo;
-    private final AdminsTasksQueueProductsRegistrationRepository adminsProductsRepo;
+    private  AdminsTasksQueueVendorRegistrationRepository adminsVendorRepo;
+    private  AdminsTasksQueueProductsRegistrationRepository adminsProductsRepo;
 
     // -----------------------------
     // Создание задач
@@ -113,6 +113,7 @@ public class ServiceTaskManagerImpl implements ServiceTaskManager {
         TaskVendorRegistration task = vendorRegRepo.findById(taskId)
                 .orElseThrow(() -> new RuntimeException("Task not found"));
         task.setStatus(status);
+        assignVendorRegistrationTask( taskId,  adminId);
         vendorRegRepo.save(task);
     }
 
@@ -121,6 +122,7 @@ public class ServiceTaskManagerImpl implements ServiceTaskManager {
         TaskProductRegistration task = productsRegRepo.findById(taskId)
                 .orElseThrow(() -> new RuntimeException("Task not found"));
         task.setStatus(status);
+        assignProductsRegistrationTask(taskId,  adminId);
         productsRegRepo.save(task);
     }
 }
