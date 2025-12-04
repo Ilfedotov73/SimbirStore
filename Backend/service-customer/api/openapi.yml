@@ -1,0 +1,464 @@
+openapi: 3.0.3
+info:
+  title: ServiceCustomer API
+  version: 0.1.0
+  description: >
+    API сервиса ServiceCustomer — отображение товаров, продавцов, отзывов
+    и уведомлений для покупателей. Поддерживает поиск, фильтры, просмотр
+    подробностей товара и создание торговых предложений (offers).
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    Paging:
+      type: object
+      properties:
+        page:
+          type: integer
+          example: 1
+        size:
+          type: integer
+          example: 20
+        total:
+          type: integer
+          example: 124
+    ProductSummary:
+      type: object
+      required: [id, name, price, photoUrl]
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 101
+        name:
+          type: string
+          example: "Набор инструментов"
+        price:
+          type: number
+          format: float
+          example: 1999.99
+        photoUrl:
+          type: string
+          format: uri
+          example: "https://cdn.simbirstore.local/photos/101.jpg"
+        characteristics:
+          type: string
+          example: "цвет: черный; вес: 1.2kg"
+        productRating:
+          type: number
+          format: float
+          example: 4.5
+        vendorId:
+          type: integer
+          example: 7
+    Product:
+      allOf:
+        - $ref: '#/components/schemas/ProductSummary'
+        - type: object
+          properties:
+            createAt:
+              type: string
+              format: date-time
+              example: "2025-11-19T12:34:56Z"
+    Vendor:
+      type: object
+      required: [id, firstName, lastName, login]
+      properties:
+        id:
+          type: integer
+          example: 7
+        firstName:
+          type: string
+          example: "Иван"
+        lastName:
+          type: string
+          example: "Иванов"
+        phoneNumber:
+          type: string
+          example: "+7 999 111 22 33"
+        photoUrl:
+          type: string
+          format: uri
+        vendorTelegramId:
+          type: string
+          example: "@vendor_ivan"
+        createAt:
+          type: string
+          format: date-time
+    Customer:
+      type: object
+      required: [id, firstName, lastName, login, email]
+      properties:
+        id:
+          type: integer
+          example: 33
+        firstName:
+          type: string
+        lastName:
+          type: string
+        phoneNumber:
+          type: string
+        photoUrl:
+          type: string
+          format: uri
+        customerTelegramId:
+          type: string
+          example: "@buyer_petr"
+        createAt:
+          type: string
+          format: date-time
+        login:
+          type: string
+        email:
+          type: string
+          format: email
+    Review:
+      type: object
+      properties:
+        id:
+          type: integer
+        customerId:
+          type: integer
+        productId:
+          type: integer
+        review:
+          type: string
+        rating:
+          type: number
+          format: float
+    Notification:
+      type: object
+      properties:
+        id:
+          type: integer
+        text:
+          type: string
+        entityId:
+          type: integer
+          description: "Id сущности (product, vendor, task...) связанной с уведомлением"
+        createAt:
+          type: string
+          format: date-time
+    OfferRequest:
+      type: object
+      required: [buyerId, offerPrice]
+      properties:
+        buyerId:
+          type: integer
+          example: 33
+        offerPrice:
+          type: number
+          format: float
+          example: 1500.00
+        message:
+          type: string
+          example: "Готов заплатить 1500, можно ли торг?"
+    OfferResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        productId:
+          type: integer
+        buyerId:
+          type: integer
+        vendorId:
+          type: integer
+        offerPrice:
+          type: number
+          format: float
+        message:
+          type: string
+        status:
+          type: string
+          enum: [pending, accepted, rejected, counter]
+          example: pending
+        createAt:
+          type: string
+          format: date-time
+    PagedProducts:
+      type: object
+      properties:
+        paging:
+          $ref: '#/components/schemas/Paging'
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductSummary'
+paths:
+  /products:
+    get:
+      summary: Получить список товаров (фильтры, сортировка, пагинация)
+      tags:
+        - products
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+          description: Номер страницы (1-based)
+        - name: size
+          in: query
+          schema:
+            type: integer
+          description: Размер страницы
+        - name: minPrice
+          in: query
+          schema:
+            type: number
+          description: Фильтр по минимальной цене
+        - name: maxPrice
+          in: query
+          schema:
+            type: number
+          description: Фильтр по максимальной цене
+        - name: vendorId
+          in: query
+          schema:
+            type: integer
+          description: По товарам конкретного продавца
+        - name: query
+          in: query
+          schema:
+            type: string
+          description: Поиск по названию/характеристикам
+        - name: sort
+          in: query
+          schema:
+            type: string
+            example: price.asc
+          description: Поле и направление сортировки (например price.asc, price.desc, rating.desc)
+      responses:
+        '200':
+          description: Список товаров
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PagedProducts'
+  /products/{productId}:
+    get:
+      summary: Получить подробности товара (включая продавца и отзывы)
+      tags:
+        - products
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Полные данные о товаре
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  product:
+                    $ref: '#/components/schemas/Product'
+                  vendor:
+                    $ref: '#/components/schemas/Vendor'
+                  reviewsCount:
+                    type: integer
+                    description: Общее количество отзывов
+                    example: 12
+                  averageRating:
+                    type: number
+                    format: float
+                    description: Средняя оценка на основе отзывов
+                    example: 4.8
+        '404':
+          description: Товар не найден
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+  /products/{productId}/reviews:
+    get:
+      summary: Получить отзывы о товаре
+      tags:
+        - products
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: size
+          in: query
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Список отзывов
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  paging:
+                    $ref: '#/components/schemas/Paging'
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Review'
+  /products/{productId}/offers:
+    post:
+      summary: Создать предложение (торг) покупателя по товару
+      tags:
+        - products
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OfferRequest'
+      responses:
+        '201':
+          description: Предложение создано
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OfferResponse'
+        '400':
+          description: Неверный запрос
+  /vendors/{vendorId}:
+    get:
+      summary: Получить информацию о продавце
+      tags:
+        - vendors
+      parameters:
+        - name: vendorId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Данные продавца
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Vendor'
+        '404':
+          description: Продавец не найден
+  /vendors/{vendorId}/products:
+    get:
+      summary: Получить товары конкретного продавца
+      tags:
+        - vendors
+      parameters:
+        - name: vendorId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: size
+          in: query
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Список товаров продавца
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PagedProducts'
+  /customers/{customerId}:
+    get:
+      summary: Получить профиль покупателя (публичные поля)
+      tags:
+        - customers
+      parameters:
+        - name: customerId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Данные покупателя
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+        '404':
+          description: Покупатель не найден
+  /notifications:
+    get:
+      summary: Получить уведомления по покупателю за период
+      tags:
+        - notifications
+      parameters:
+        - name: customerId
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: from
+          in: query
+          schema:
+            type: string
+            format: date-time
+          description: Начало периода
+        - name: to
+          in: query
+          schema:
+            type: string
+            format: date-time
+          description: Конец периода
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: size
+          in: query
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Список уведомлений
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  paging:
+                    $ref: '#/components/schemas/Paging'
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Notification'
+        '400':
+          description: Неверные параметры
+tags:
+  - name: products
+    description: Операции с товарами (поиск, просмотр)
+  - name: vendors
+    description: Данные о продавцах
+  - name: customers
+    description: Профили покупателей
+  - name: notifications
+    description: Уведомления (Notices)
