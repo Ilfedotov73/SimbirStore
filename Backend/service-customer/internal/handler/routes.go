@@ -6,7 +6,7 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
-func InitRoutes(r *gin.Engine, productHandler *ProductHandler, vendorHandler *VendorHandler, customerHandler *CustomerHandler) {
+func InitRoutes(r *gin.Engine, productHandler *ProductHandler, vendorHandler *VendorHandler, customerHandler *CustomerHandler, notificationHandler *NotificationHandler) {
 	r.StaticFile("/openapi.yml", "./api/openapi.yml")
 
 	docsUrl := ginSwagger.URL("/openapi.yml")
@@ -32,5 +32,10 @@ func InitRoutes(r *gin.Engine, productHandler *ProductHandler, vendorHandler *Ve
 	customerGroup := r.Group("/customers")
 	{
 		customerGroup.GET("/:customerId", customerHandler.GetCustomer)
+	}
+
+	notificationGroup := r.Group("/notifications")
+	{
+		notificationGroup.GET("", notificationHandler.GetNotifications)
 	}
 }

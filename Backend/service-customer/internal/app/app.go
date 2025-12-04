@@ -36,19 +36,22 @@ func Run() {
 	vendorRepository := repository.NewVendorRepository(db)
 	reviewRepository := repository.NewReviewRepository(db)
 	customerRepository := repository.NewCustomerRepository(db)
+	notificationRepository := repository.NewNotificationRepository(db)
 
 	vendorService := service.NewVendorService(vendorRepository)
 	reviewService := service.NewReviewService(reviewRepository)
 	productService := service.NewProductService(productRepository, vendorService, reviewService)
 	customerService := service.NewCustomerService(customerRepository)
+	notificationService := service.NewNotificationService(notificationRepository)
 
 	productHandler := handler.NewProductHandler(productService, reviewService)
 	vendorHandler := handler.NewVendorHandler(vendorService, productService)
 	customerHandler := handler.NewCustomerHandler(customerService)
+	notificationHandler := handler.NewNotificationHandler(notificationService)
 
 	router := gin.Default()
 
-	handler.InitRoutes(router, productHandler, vendorHandler, customerHandler)
+	handler.InitRoutes(router, productHandler, vendorHandler, customerHandler, notificationHandler)
 
 	port := os.Getenv("HTTP_PORT")
 	if port == "" {
