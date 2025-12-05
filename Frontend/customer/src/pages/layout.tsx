@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { BellIcon, SearchIcon, UserIcon } from "lucide-react";
 import { Form, Link, Outlet } from "react-router";
 
-function Layout() {
+export default function Layout() {
     return (
         <>
             <header className="flex mx-5 sm:mx-20 md:mx-30 xl:mx-60 h-20 items-center">
@@ -32,13 +32,9 @@ function Layout() {
                     </Button>
                 </div>
             </header>
-            <div id="root" className="min-h-screen flex flex-col items-center mt-12">
+            <main className="min-h-screen flex flex-col items-center mt-12">
                 <Outlet />
-            </div>
-            
-        </>
-        
+            </main>
+        </>   
     )
 }
-
-export default Layout;

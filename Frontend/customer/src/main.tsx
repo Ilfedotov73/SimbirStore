@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { createBrowserRouter, Outlet, RouterProvider } from 'react-router';
 
 import './index.css'
+import Layout from './pages/layout';
 import Main from './pages/Index';
 import Products from './pages/products/Index';
 import Product from './pages/products/product/Index';
@@ -10,7 +11,6 @@ import Reviews from './pages/products/product/Reviews';
 import Vendor from './pages/vendor/Index';
 import Profile from './pages/profile/Index';
 import Notifications from './pages/notifications/Index';
-import Layout from './pages/layout';
 
 const router = createBrowserRouter([
     {
@@ -29,12 +29,18 @@ const router = createBrowserRouter([
                 path: 'products/:productId', 
                 element: <Outlet />,
                 children: [
-                    { index: true, element: <Product/> },
-                    { path: 'reviews', element: <Reviews/> },
+                    { 
+                        index: true, 
+                        element: <Product/> 
+                    },
+                    { 
+                        path: 'reviews', 
+                        element: <Reviews/> 
+                    },
                 ]
             },
             { 
-                path: 'vendor', 
+                path: 'vendor/:id', 
                 element: <Vendor/> 
             },
             { 
