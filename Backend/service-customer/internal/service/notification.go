@@ -6,6 +6,7 @@ import (
 	"time"
 )
 
+//go:generate go run github.com/vektra/mockery/v2@latest --name=NotificationRepository --output=../../mocks --outpkg=mocks --with-expecter=true
 type NotificationRepository interface {
 	GetByCustomerID(ctx context.Context, customerID int64, from, to time.Time, offset, limit int) ([]model.Notification, int, error)
 }

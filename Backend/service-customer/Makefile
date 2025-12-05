@@ -13,7 +13,15 @@ build: tidy
 run:
 	go run $(MAIN_PATH)
 
+.PHONY: test
+test: mock
+	go test ./... -v
+
+.PHONY: mock
+mock:
+	go generate ./...
+
 .PHONY: tidy
-tidy:
+tidy: mock
 	go fmt ./...
 	go mod tidy

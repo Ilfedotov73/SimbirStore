@@ -5,6 +5,7 @@ import (
 	"service-customer/internal/model"
 )
 
+//go:generate go run github.com/vektra/mockery/v2@latest --name=CustomerRepository --output=../../mocks --outpkg=mocks --with-expecter=true
 type CustomerRepository interface {
 	GetCustomerByID(ctx context.Context, id int64) (*model.Customer, error)
 }

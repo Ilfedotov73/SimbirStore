@@ -5,15 +5,18 @@ import (
 	"service-customer/internal/model"
 )
 
+//go:generate go run github.com/vektra/mockery/v2@latest --name=ProductRepository --output=../../mocks --outpkg=mocks --with-expecter=true
 type ProductRepository interface {
 	GetProductByID(ctx context.Context, id int64) (*model.Product, error)
 	GetProducts(ctx context.Context, offset, limit int, minPrice, maxPrice float64, vendorID int64, queryParam, sortParam string) ([]model.Product, int, error)
 }
 
+//go:generate go run github.com/vektra/mockery/v2@latest --name=ProductVendorService --output=../../mocks --outpkg=mocks --with-expecter=true
 type ProductVendorService interface {
 	GetVendorByID(ctx context.Context, id int64) (*model.Vendor, error)
 }
 
+//go:generate go run github.com/vektra/mockery/v2@latest --name=ProductReviewService --output=../../mocks --outpkg=mocks --with-expecter=true
 type ProductReviewService interface {
 	GetReviewStats(ctx context.Context, productID int64) (int, float64, error)
 }

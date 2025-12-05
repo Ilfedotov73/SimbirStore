@@ -5,6 +5,7 @@ import (
 	"service-customer/internal/model"
 )
 
+//go:generate go run github.com/vektra/mockery/v2@latest --name=ReviewRepository --output=../../mocks --outpkg=mocks --with-expecter=true
 type ReviewRepository interface {
 	GetStats(ctx context.Context, productID int64) (int, float64, error)
 	GetByProductID(ctx context.Context, productID int64, offset, limit int) ([]model.Review, int, error)
