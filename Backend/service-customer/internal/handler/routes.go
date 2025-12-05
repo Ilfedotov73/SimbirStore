@@ -21,6 +21,7 @@ func InitRoutes(r *gin.Engine, productHandler *ProductHandler, vendorHandler *Ve
 		productGroup.GET("", productHandler.GetProducts)
 		productGroup.GET("/:productId", productHandler.GetProductDetails)
 		productGroup.GET("/:productId/reviews", productHandler.GetProductReviews)
+		productGroup.POST("/:productId/offers", productHandler.CreateOffer)
 	}
 
 	vendorGroup := r.Group("/vendors")

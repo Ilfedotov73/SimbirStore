@@ -148,7 +148,10 @@ components:
       properties:
         buyerId:
           type: integer
-          example: 33
+          example: 1
+        vendorId:
+          type: integer
+          example: 1
         offerPrice:
           type: number
           format: float

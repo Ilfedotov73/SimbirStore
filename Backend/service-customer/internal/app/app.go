@@ -37,14 +37,16 @@ func Run() {
 	reviewRepository := repository.NewReviewRepository(db)
 	customerRepository := repository.NewCustomerRepository(db)
 	notificationRepository := repository.NewNotificationRepository(db)
+	offerRepository := repository.NewOfferRepository(db)
 
 	vendorService := service.NewVendorService(vendorRepository)
 	reviewService := service.NewReviewService(reviewRepository)
 	productService := service.NewProductService(productRepository, vendorService, reviewService)
 	customerService := service.NewCustomerService(customerRepository)
 	notificationService := service.NewNotificationService(notificationRepository)
+	offerService := service.NewOfferService(offerRepository)
 
-	productHandler := handler.NewProductHandler(productService, reviewService)
+	productHandler := handler.NewProductHandler(productService, reviewService, offerService)
 	vendorHandler := handler.NewVendorHandler(vendorService, productService)
 	customerHandler := handler.NewCustomerHandler(customerService)
 	notificationHandler := handler.NewNotificationHandler(notificationService)

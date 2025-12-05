@@ -20,15 +20,21 @@ type ReviewService interface {
 	GetReviews(ctx context.Context, productID int64, page, size int) ([]model.Review, int, error)
 }
 
+type OfferService interface {
+	CreateOffer(ctx context.Context, offer model.Offer) (*model.Offer, error)
+}
+
 type ProductHandler struct {
 	productService ProductService
 	reviewService  ReviewService
+	offerService   OfferService
 }
 
-func NewProductHandler(productService ProductService, reviewService ReviewService) *ProductHandler {
+func NewProductHandler(productService ProductService, reviewService ReviewService, offerService OfferService) *ProductHandler {
 	return &ProductHandler{
 		productService: productService,
 		reviewService:  reviewService,
+		offerService:   offerService,
 	}
 }
 
@@ -142,4 +148,45 @@ func (h *ProductHandler) GetProductReviews(c *gin.Context) {
 		Items:  dtos,
 	}
 	c.JSON(http.StatusOK, response)
+}
+
+func (h *ProductHandler) CreateOffer(c *gin.Context) {
+	productID, err := strconv.ParseInt(c.Param("productId"), 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid product id"})
+		return
+	}
+
+	var req dto.OfferRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	offerModel := model.Offer{
+		ProductID:  productID,
+		VendorID:   req.VendorID,
+		BuyerID:    req.BuyerID,
+		OfferPrice: req.OfferPrice,
+		Message:    req.Message,
+		Status:     model.OfferStatusPending,
+	}
+
+	createdOffer, err := h.offerService.CreateOffer(c.Request.Context(), offerModel)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	resp := dto.OfferResponse{
+		ID:         createdOffer.ID,
+		ProductID:  createdOffer.ProductID,
+		BuyerID:    createdOffer.BuyerID,
+		VendorID:   createdOffer.VendorID,
+		OfferPrice: createdOffer.OfferPrice,
+		Message:    createdOffer.Message,
+		Status:     string(createdOffer.Status),
+		CreateAt:   createdOffer.CreateAt,
+	}
+	c.JSON(http.StatusCreated, resp)
 }
