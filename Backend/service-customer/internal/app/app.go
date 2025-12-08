@@ -9,6 +9,7 @@ import (
 	"os"
 	"os/signal"
 	"service-customer/internal/handler"
+	"service-customer/internal/middleware"
 	"service-customer/internal/repository"
 	"service-customer/internal/service"
 	"syscall"
@@ -52,6 +53,8 @@ func Run() {
 	notificationHandler := handler.NewNotificationHandler(notificationService)
 
 	router := gin.Default()
+
+	router.Use(middleware.CORSMiddleware())
 
 	handler.InitRoutes(router, productHandler, vendorHandler, customerHandler, notificationHandler)
 

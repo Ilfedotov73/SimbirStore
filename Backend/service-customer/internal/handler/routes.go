@@ -18,7 +18,7 @@ func InitRoutes(r *gin.Engine, productHandler *ProductHandler, vendorHandler *Ve
 
 	productGroup := r.Group("/products")
 	{
-		productGroup.GET("/", productHandler.GetProducts)
+		productGroup.GET("", productHandler.GetProducts)
 		productGroup.GET("/:productId", productHandler.GetProductDetails)
 		productGroup.GET("/:productId/reviews", productHandler.GetProductReviews)
 		productGroup.POST("/:productId/offers", productHandler.CreateOffer)
@@ -37,6 +37,6 @@ func InitRoutes(r *gin.Engine, productHandler *ProductHandler, vendorHandler *Ve
 
 	notificationGroup := r.Group("/notifications")
 	{
-		notificationGroup.GET("/", notificationHandler.GetNotifications)
+		notificationGroup.GET("", notificationHandler.GetNotifications)
 	}
 }
