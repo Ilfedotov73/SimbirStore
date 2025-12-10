@@ -13,7 +13,7 @@ type ProductRepository interface {
 
 //go:generate go run github.com/vektra/mockery/v2@latest --name=ProductVendorService --output=../../mocks --outpkg=mocks --with-expecter=true
 type ProductVendorService interface {
-	GetVendorByID(ctx context.Context, id int64) (*model.Vendor, error)
+	GetUserByID(ctx context.Context, id int64) (*model.User, error)
 }
 
 //go:generate go run github.com/vektra/mockery/v2@latest --name=ProductReviewService --output=../../mocks --outpkg=mocks --with-expecter=true
@@ -39,13 +39,13 @@ func (s *ProductService) GetProductByID(ctx context.Context, productID int64) (*
 	return s.repo.GetProductByID(ctx, productID)
 }
 
-func (s *ProductService) GetFullProductData(ctx context.Context, productID int64) (*model.Product, *model.Vendor, int, float64, error) {
+func (s *ProductService) GetFullProductData(ctx context.Context, productID int64) (*model.Product, *model.User, int, float64, error) {
 	product, err := s.repo.GetProductByID(ctx, productID)
 	if err != nil {
 		return nil, nil, 0, 0, err
 	}
 
-	vendor, err := s.vendorService.GetVendorByID(ctx, product.VendorID)
+	vendor, err := s.vendorService.GetUserByID(ctx, product.VendorID)
 	if err != nil {
 		return nil, nil, 0, 0, err
 	}

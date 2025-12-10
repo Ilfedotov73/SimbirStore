@@ -12,7 +12,7 @@ import (
 )
 
 type CustomerService interface {
-	GetCustomerByID(ctx context.Context, id int64) (*model.Customer, error)
+	GetUserByID(ctx context.Context, id int64) (*model.User, error)
 }
 
 type CustomerHandler struct {
@@ -30,7 +30,7 @@ func (h *CustomerHandler) GetCustomer(c *gin.Context) {
 		return
 	}
 
-	customer, err := h.customerService.GetCustomerByID(c.Request.Context(), id)
+	customer, err := h.customerService.GetUserByID(c.Request.Context(), id)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			c.JSON(http.StatusNotFound, gin.H{"message": "Customer not found"})
@@ -46,7 +46,7 @@ func (h *CustomerHandler) GetCustomer(c *gin.Context) {
 		LastName:           customer.LastName,
 		PhoneNumber:        customer.PhoneNumber,
 		PhotoURL:           customer.PhotoURL,
-		CustomerTelegramID: customer.CustomerTelegramID,
+		CustomerTelegramID: customer.UserTelegramID,
 		CreateAt:           customer.CreateAt,
 		Login:              customer.Login,
 		Email:              customer.Email,

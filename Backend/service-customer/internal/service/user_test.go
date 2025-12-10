@@ -14,15 +14,15 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-func TestVendorService_GetVendorByID(t *testing.T) {
+func TestUserService_GetUserByID(t *testing.T) {
 	type args struct {
 		ctx context.Context
 		id  int64
 	}
 
-	type mockBehavior func(r *mocks.VendorRepository)
+	type mockBehavior func(r *mocks.UserRepository)
 
-	testVendor := &model.Vendor{
+	testUser := &model.User{
 		ID:        42,
 		FirstName: "Jane",
 		LastName:  "Doe",
@@ -34,33 +34,33 @@ func TestVendorService_GetVendorByID(t *testing.T) {
 		name    string
 		args    args
 		mock    mockBehavior
-		want    *model.Vendor
+		want    *model.User
 		wantErr bool
 	}{
 		{
-			name: "Success - Vendor Found",
+			name: "Success - User Found",
 			args: args{
 				ctx: context.Background(),
 				id:  42,
 			},
-			mock: func(r *mocks.VendorRepository) {
+			mock: func(r *mocks.UserRepository) {
 				r.EXPECT().
-					GetVendorByID(mock.Anything, int64(42)).
-					Return(testVendor, nil)
+					GetUserByID(mock.Anything, int64(42)).
+					Return(testUser, nil)
 			},
-			want:    testVendor,
+			want:    testUser,
 			wantErr: false,
 		},
 		{
-			name: "Error - Vendor Not Found in Repository",
+			name: "Error - User Not Found in Repository",
 			args: args{
 				ctx: context.Background(),
 				id:  99,
 			},
-			mock: func(r *mocks.VendorRepository) {
+			mock: func(r *mocks.UserRepository) {
 				repoErr := errors.New("sql: no rows in result set")
 				r.EXPECT().
-					GetVendorByID(mock.Anything, int64(99)).
+					GetUserByID(mock.Anything, int64(99)).
 					Return(nil, repoErr)
 			},
 			want:    nil,
@@ -72,10 +72,10 @@ func TestVendorService_GetVendorByID(t *testing.T) {
 				ctx: context.Background(),
 				id:  10,
 			},
-			mock: func(r *mocks.VendorRepository) {
+			mock: func(r *mocks.UserRepository) {
 				repoErr := errors.New("connection failed")
 				r.EXPECT().
-					GetVendorByID(mock.Anything, int64(10)).
+					GetUserByID(mock.Anything, int64(10)).
 					Return(nil, repoErr)
 			},
 			want:    nil,
@@ -85,13 +85,13 @@ func TestVendorService_GetVendorByID(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			repo := mocks.NewVendorRepository(t)
+			repo := mocks.NewUserRepository(t)
 
 			tt.mock(repo)
 
-			s := service.NewVendorService(repo)
+			s := service.NewUserService(repo)
 
-			got, err := s.GetVendorByID(tt.args.ctx, tt.args.id)
+			got, err := s.GetUserByID(tt.args.ctx, tt.args.id)
 
 			if tt.wantErr {
 				assert.Error(t, err)

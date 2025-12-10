@@ -89,14 +89,14 @@ func TestProductService_GetFullProductData(t *testing.T) {
 	type mockBehavior func(r *mocks.ProductRepository, v *mocks.ProductVendorService, rev *mocks.ProductReviewService)
 
 	testProduct := &model.Product{ID: 10, VendorID: 5, Name: "Phone"}
-	testVendor := &model.Vendor{ID: 5, FirstName: "John"}
+	testVendor := &model.User{ID: 5, FirstName: "John"}
 
 	tests := []struct {
 		name       string
 		args       args
 		mock       mockBehavior
 		wantProd   *model.Product
-		wantVendor *model.Vendor
+		wantVendor *model.User
 		wantCount  int
 		wantAvg    float64
 		wantErr    bool
@@ -109,7 +109,7 @@ func TestProductService_GetFullProductData(t *testing.T) {
 			},
 			mock: func(r *mocks.ProductRepository, v *mocks.ProductVendorService, rev *mocks.ProductReviewService) {
 				r.EXPECT().GetProductByID(mock.Anything, int64(10)).Return(testProduct, nil)
-				v.EXPECT().GetVendorByID(mock.Anything, int64(5)).Return(testVendor, nil)
+				v.EXPECT().GetUserByID(mock.Anything, int64(5)).Return(testVendor, nil)
 				rev.EXPECT().GetReviewStats(mock.Anything, int64(10)).Return(15, 4.5, nil)
 			},
 			wantProd:   testProduct,
@@ -141,7 +141,7 @@ func TestProductService_GetFullProductData(t *testing.T) {
 			},
 			mock: func(r *mocks.ProductRepository, v *mocks.ProductVendorService, rev *mocks.ProductReviewService) {
 				r.EXPECT().GetProductByID(mock.Anything, int64(10)).Return(testProduct, nil)
-				v.EXPECT().GetVendorByID(mock.Anything, int64(5)).Return(nil, errors.New("vendor unavailable"))
+				v.EXPECT().GetUserByID(mock.Anything, int64(5)).Return(nil, errors.New("vendor unavailable"))
 			},
 			wantProd:   nil,
 			wantVendor: nil,
@@ -157,7 +157,7 @@ func TestProductService_GetFullProductData(t *testing.T) {
 			},
 			mock: func(r *mocks.ProductRepository, v *mocks.ProductVendorService, rev *mocks.ProductReviewService) {
 				r.EXPECT().GetProductByID(mock.Anything, int64(10)).Return(testProduct, nil)
-				v.EXPECT().GetVendorByID(mock.Anything, int64(5)).Return(testVendor, nil)
+				v.EXPECT().GetUserByID(mock.Anything, int64(5)).Return(testVendor, nil)
 				rev.EXPECT().GetReviewStats(mock.Anything, int64(10)).Return(0, 0.0, errors.New("review service down"))
 			},
 			wantProd:   testProduct,

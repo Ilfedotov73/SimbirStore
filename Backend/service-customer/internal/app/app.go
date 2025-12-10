@@ -33,23 +33,21 @@ func Run() {
 	}
 	defer db.Close()
 
+	userRepository := repository.NewUserRepository(db)
 	productRepository := repository.NewProductRepository(db)
-	vendorRepository := repository.NewVendorRepository(db)
 	reviewRepository := repository.NewReviewRepository(db)
-	customerRepository := repository.NewCustomerRepository(db)
 	notificationRepository := repository.NewNotificationRepository(db)
 	offerRepository := repository.NewOfferRepository(db)
 
-	vendorService := service.NewVendorService(vendorRepository)
+	userService := service.NewUserService(userRepository)
 	reviewService := service.NewReviewService(reviewRepository)
-	productService := service.NewProductService(productRepository, vendorService, reviewService)
-	customerService := service.NewCustomerService(customerRepository)
+	productService := service.NewProductService(productRepository, userService, reviewService)
 	notificationService := service.NewNotificationService(notificationRepository)
 	offerService := service.NewOfferService(offerRepository)
 
 	productHandler := handler.NewProductHandler(productService, reviewService, offerService)
-	vendorHandler := handler.NewVendorHandler(vendorService, productService)
-	customerHandler := handler.NewCustomerHandler(customerService)
+	vendorHandler := handler.NewVendorHandler(userService, productService)
+	customerHandler := handler.NewCustomerHandler(userService)
 	notificationHandler := handler.NewNotificationHandler(notificationService)
 
 	router := gin.Default()

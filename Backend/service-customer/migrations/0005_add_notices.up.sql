@@ -1,0 +1,6 @@
+CREATE TABLE IF NOT EXISTS notices (
+    id SERIAL PRIMARY KEY,
+    text TEXT NOT NULL,
+    entity_id INT,
+    create_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

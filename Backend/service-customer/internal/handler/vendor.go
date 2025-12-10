@@ -12,7 +12,7 @@ import (
 )
 
 type VendorService interface {
-	GetVendorByID(ctx context.Context, id int64) (*model.Vendor, error)
+	GetUserByID(ctx context.Context, id int64) (*model.User, error)
 }
 
 type VendorProductService interface {
@@ -38,7 +38,7 @@ func (h *VendorHandler) GetVendor(c *gin.Context) {
 		return
 	}
 
-	v, err := h.vendorService.GetVendorByID(c.Request.Context(), id)
+	v, err := h.vendorService.GetUserByID(c.Request.Context(), id)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			c.JSON(http.StatusNotFound, gin.H{"message": "Vendor not found"})
@@ -54,7 +54,7 @@ func (h *VendorHandler) GetVendor(c *gin.Context) {
 		LastName:         v.LastName,
 		PhoneNumber:      v.PhoneNumber,
 		PhotoURL:         v.PhotoURL,
-		VendorTelegramID: v.VendorTelegramID,
+		VendorTelegramID: v.UserTelegramID,
 		CreateAt:         v.CreateAt,
 	}
 	c.JSON(http.StatusOK, vendorDTO)

@@ -12,7 +12,7 @@ import (
 )
 
 type ProductService interface {
-	GetFullProductData(ctx context.Context, productID int64) (*model.Product, *model.Vendor, int, float64, error)
+	GetFullProductData(ctx context.Context, productID int64) (*model.Product, *model.User, int, float64, error)
 	GetProducts(ctx context.Context, page, size int, minPrice, maxPrice float64, vendorID int64, query, sort string) ([]model.Product, int, error)
 }
 
@@ -78,7 +78,7 @@ func (h *ProductHandler) GetProductDetails(c *gin.Context) {
 		LastName:         vend.LastName,
 		PhoneNumber:      vend.PhoneNumber,
 		PhotoURL:         vend.PhotoURL,
-		VendorTelegramID: vend.VendorTelegramID,
+		VendorTelegramID: vend.UserTelegramID,
 		CreateAt:         vend.CreateAt,
 	}
 
