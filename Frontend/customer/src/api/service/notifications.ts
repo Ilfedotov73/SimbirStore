@@ -1,7 +1,7 @@
 import { ErrorDTO, type ErrorDTOType } from "../dtos/base";
 import { NotificationsDTO, type NotificationsDTOType } from "../dtos/notifications";
 
-const BASE_URL = `${import.meta.env.SERVICE_CUSTOMER_URL}/notifications`;
+const BASE_URL = `${import.meta.env.VITE_SERVICE_CUSTOMER_URL}/notifications`;
 const BASE_PAGE_SIZE = 20;
 
 export async function getNotifications(

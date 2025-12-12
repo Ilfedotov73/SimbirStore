@@ -2,7 +2,7 @@ import { ErrorDTO, type ErrorDTOType } from "../dtos/base";
 import { ProductsDTO, type ProductsDTOType } from "../dtos/products";
 import { VendorDTO, type VendorDTOType } from "../dtos/vendors";
 
-const BASE_URL = `${import.meta.env.SERVICE_CUSTOMER_URL}/vendors`;
+const BASE_URL = `${import.meta.env.VITE_SERVICE_CUSTOMER_URL}/vendors`;
 const BASE_PAGE_SIZE = 20;
 
 export async function getVendor(vendorId: number) : Promise<VendorDTOType | ErrorDTOType> {

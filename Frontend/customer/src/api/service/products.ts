@@ -1,22 +1,21 @@
-import { ErrorDTO, type ErrorDTOType } from "../dtos/base";
 import { ProductsDTO, ProductDTO, type ProductsDTOType, type ProductDTOType, type ReviewsDTOType, ReviewsDTO, type OfferCreateDTOType } from "../dtos/products";
 
-const BASE_URL = `${import.meta.env.SERVICE_CUSTOMER_URL}/products`;
+const BASE_URL = `${import.meta.env.VITE_SERVICE_CUSTOMER_URL}/products`;
 const BASE_PAGE_SIZE = 20;
 
 export type ProductSortType = {
     field: string,
-    order: 'asc' | 'desc',
+    order: string,
 };
 
 export async function getProducts(
     page: number, 
-    minPrice: number | undefined, 
-    maxPrice: number | undefined,
-    vendorId: number | undefined,
-    query: string | undefined,
-    sort: ProductSortType | undefined,
-) : Promise<ProductsDTOType | ErrorDTOType> {
+    minPrice: number | undefined = undefined, 
+    maxPrice: number | undefined = undefined,
+    vendorId: number | undefined = undefined,
+    query: string | undefined = undefined,
+    sort: ProductSortType | undefined = undefined,
+) : Promise<ProductsDTOType | Error> {
     const params = new URLSearchParams(`page=${page}&size=${BASE_PAGE_SIZE}`);
     if (minPrice !== undefined) {
         params.append("minPrice", minPrice.toString());
@@ -36,33 +35,25 @@ export async function getProducts(
     const response = await fetch(`${BASE_URL}?${params.toString()}`);
 
     if (!response.ok) {
-        return ErrorDTO.parse({
-            message: await response.text(),
-        });
+        return new Error(await response.text());
     }
 
     const res = ProductsDTO.safeParse(await response.json());
     if (!res.success) {
-        return ErrorDTO.parse({
-            message: res.error.message,
-        });
+        return new Error(res.error.message);
     }
     return res.data;
 }
 
-export async function getProduct(productId: number) : Promise<ProductDTOType | ErrorDTOType> {
+export async function getProduct(productId: number) : Promise<ProductDTOType | Error> {
     const response = await fetch(`${BASE_URL}/${productId}`);
     if (!response.ok) {
-        return ErrorDTO.parse({
-            message: await response.text(),
-        });
+        return new Error(await response.text());
     }
 
     const res = ProductDTO.safeParse(await response.json());
     if (!res.success) {
-        return ErrorDTO.parse({
-            message: res.error.message,
-        });
+        return new Error(res.error.message);
     }
     return res.data;
 }
@@ -70,19 +61,15 @@ export async function getProduct(productId: number) : Promise<ProductDTOType | E
 export async function getProductReviews(
     productId: number,
     page: number,
-) : Promise<ReviewsDTOType | ErrorDTOType> {
+) : Promise<ReviewsDTOType | Error> {
     const response = await fetch(`${BASE_URL}/${productId}/reviews?page=${page}&size=${BASE_PAGE_SIZE}`);
     if (!response.ok) {
-        return ErrorDTO.parse({
-            message: await response.text(),
-        });
+        return new Error(await response.text());
     }
 
     const res = ReviewsDTO.safeParse(await response.json());
     if (!res.success) {
-        return ErrorDTO.parse({
-            message: res.error.message,
-        });
+        return new Error(res.error.message);
     }
     return res.data;
 }
@@ -90,7 +77,7 @@ export async function getProductReviews(
 export async function createOffer(
     productId: number,
     requestBody: OfferCreateDTOType,
-) : Promise<null | ErrorDTOType> {
+) : Promise<null | Error> {
     const response = await fetch(`${BASE_URL}/${productId}/offers`, {
         method: "POST",
         headers: {
@@ -99,9 +86,7 @@ export async function createOffer(
         body: JSON.stringify(requestBody),
     });
     if (!response.ok) {
-        return ErrorDTO.parse({
-            message: await response.text(),
-        });
+        return new Error(await response.text());
     }
     return null;
 }
