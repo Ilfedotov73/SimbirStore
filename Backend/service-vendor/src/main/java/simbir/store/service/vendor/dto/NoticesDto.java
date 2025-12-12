@@ -10,6 +10,6 @@ import java.sql.Date;
 public class NoticesDto {
     private int id;
     private String text;
-    private int entityrId;
+    private int entityId;
     private Date createAt;
 }

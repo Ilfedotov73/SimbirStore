@@ -1,0 +1,160 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: simbir
+      changes:
+        - createTable:
+            tableName: users
+            columns:
+              - column:
+                  name: id
+                  type: INT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: first_name
+                  type: VARCHAR(255)
+              - column:
+                  name: last_name
+                  type: VARCHAR(255)
+              - column:
+                  name: phone_number
+                  type: VARCHAR(50)
+              - column:
+                  name: photo_url
+                  type: VARCHAR(255)
+              - column:
+                  name: user_telegram_id
+                  type: VARCHAR(50)
+              - column:
+                  name: create_at
+                  type: DATE
+              - column:
+                  name: login
+                  type: VARCHAR(100)
+                  constraints:
+                    unique: true
+              - column:
+                  name: email
+                  type: VARCHAR(255)
+              - column:
+                  name: password
+                  type: VARCHAR(255)
+              - column:
+                  name: roles
+                  type: VARCHAR(50)
+
+  - changeSet:
+      id: 2
+      author: simbir
+      changes:
+        - createTable:
+            tableName: products
+            columns:
+              - column:
+                  name: id
+                  type: INT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+              - column:
+                  name: price
+                  type: FLOAT
+              - column:
+                  name: photo_url
+                  type: VARCHAR(255)
+              - column:
+                  name: create_at
+                  type: DATE
+              - column:
+                  name: characteristics
+                  type: TEXT
+              - column:
+                  name: product_rating
+                  type: FLOAT
+
+  - changeSet:
+      id: 3
+      author: simbir
+      changes:
+        - createTable:
+            tableName: vendors_products
+            columns:
+              - column:
+                  name: id
+                  type: INT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: INT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: product_id
+                  type: INT
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseTableName: vendors_products
+            baseColumnNames: user_id
+            referencedTableName: users
+            referencedColumnNames: id
+            onDelete: CASCADE
+        - addForeignKeyConstraint:
+            baseTableName: vendors_products
+            baseColumnNames: product_id
+            referencedTableName: products
+            referencedColumnNames: id
+            onDelete: CASCADE
+
+  - changeSet:
+      id: 4
+      author: simbir
+      changes:
+        - createTable:
+            tableName: products_reviews
+            columns:
+              - column:
+                  name: id
+                  type: INT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: customer_id
+                  type: INT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: product_id
+                  type: INT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: review
+                  type: TEXT
+              - column:
+                  name: rating
+                  type: FLOAT
+        - addForeignKeyConstraint:
+            baseTableName: products_reviews
+            baseColumnNames: customer_id
+            referencedTableName: users
+            referencedColumnNames: id
+            onDelete: CASCADE
+        - addForeignKeyConstraint:
+            baseTableName: products_reviews
+            baseColumnNames: product_id
+            referencedTableName: products
+            referencedColumnNames: id
+            onDelete: CASCADE
