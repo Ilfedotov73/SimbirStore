@@ -1,0 +1,128 @@
+databaseChangeLog:
+  - changeSet:
+      id: 001-create-tasks-queues
+      author: ai
+      changes:
+
+        # -------------------------------------
+        # TABLE: tasks_queue_vendor_registration
+        # -------------------------------------
+        - createTable:
+            tableName: tasks_queue_vendor_registration
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: task_name
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: status
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deadline
+                  type: TIMESTAMP
+
+        # -------------------------------------
+        # TABLE: tasks_queue_products_registration
+        # -------------------------------------
+        - createTable:
+            tableName: tasks_queue_products_registration
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: user_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: task_name
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: product_container
+                  type: VARCHAR(1000)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: status
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deadline
+                  type: TIMESTAMP
+
+        # -----------------------------------------------------
+        # TABLE: admins_tasks_queue_vendor_registration (M2M)
+        # -----------------------------------------------------
+        - createTable:
+            tableName: admins_tasks_queue_vendor_registration
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: admin_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: task_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+
+        # ----------------------------------------------------
+        # TABLE: admins_tasks_queue_products_registration (M2M)
+        # ----------------------------------------------------
+        - createTable:
+            tableName: admins_tasks_queue_products_registration
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: admin_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: task_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
