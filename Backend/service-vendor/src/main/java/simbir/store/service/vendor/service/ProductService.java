@@ -16,9 +16,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ProductService {
 
-    private final ProductRepository productRepository;
-    private final UserRepository userRepository;
-    private final VendorsProductsRepository vendorsProductsRepository;
+    private  ProductRepository productRepository;
+    private  UserRepository userRepository;
+    private  VendorsProductsRepository vendorsProductsRepository;
 
     /**
      * Создание товара после одобрения очередью.

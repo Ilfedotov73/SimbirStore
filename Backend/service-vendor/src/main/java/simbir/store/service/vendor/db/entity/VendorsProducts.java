@@ -14,6 +14,30 @@ public class VendorsProducts {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    public User getVendor() {
+        return vendor;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public void setProduct(Product product) {
+        this.product = product;
+    }
+
+    public void setVendor(User vendor) {
+        this.vendor = vendor;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public Product getProduct() {
+        return product;
+    }
+
     /** FK → User.Id */
     @ManyToOne
     @JoinColumn(name = "user_id")
